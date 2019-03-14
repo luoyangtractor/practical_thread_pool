@@ -14,12 +14,12 @@ public:
 
 	std::future<Result> dispatch_Work(std::function<Result(Helper*)> work);
 private:
-	Worker_Thread* choose_Suitable_Thread();
+	std::shared_ptr<Worker_Thread> choose_Suitable_Thread();
 
 	int m_thread_number;
 	int m_max_task_queue_size;
 	int m_max_wait_time;
-	std::vector<Worker_Thread*> m_thread_pool;
+	std::vector<std::shared_ptr<Worker_Thread>> m_thread_pool;
 };
 
 #endif

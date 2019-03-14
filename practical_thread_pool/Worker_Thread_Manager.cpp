@@ -8,7 +8,8 @@ Worker_Thread_Manager::Worker_Thread_Manager(int thread_num, int max_wait_time, 
 {
 	for (int i = 0; i < m_thread_number; i++)
 	{
-		m_thread_pool.push_back(new Worker_Thread(m_max_task_queue_size, m_max_wait_time));
+		auto _worker_thread = std::make_shared<Worker_Thread>(m_max_task_queue_size, m_max_wait_time);
+		m_thread_pool.push_back(_worker_thread);
 	}
 }
 
@@ -18,11 +19,6 @@ Worker_Thread_Manager::~Worker_Thread_Manager()
 	for (auto iter : m_thread_pool)
 	{
 		iter->stop();
-		if (iter != nullptr)
-		{
-			delete iter;
-			iter = nullptr;
-		}
 	}
 }
 
@@ -38,9 +34,9 @@ std::future<Result> Worker_Thread_Manager::dispatch_Work(std::function<Result(He
 
 
 
-Worker_Thread* Worker_Thread_Manager::choose_Suitable_Thread()
+std::shared_ptr<Worker_Thread> Worker_Thread_Manager::choose_Suitable_Thread()
 {
-	Worker_Thread* _min_load_thread = m_thread_pool[0];
+	std::shared_ptr<Worker_Thread>_min_load_thread = m_thread_pool[0];
 	int _min_task_load = INT_MAX;
 	for (auto iter : m_thread_pool)
 	{

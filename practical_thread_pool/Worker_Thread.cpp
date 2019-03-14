@@ -6,29 +6,18 @@ Worker_Thread::Worker_Thread(int max_queue_size, int max_wait_time):Thread_Base(
 															m_max_queue_size(max_queue_size),\
 															m_empty_flag(true),\
 															m_thread_status(READY),\
-															m_max_wait_time(max_wait_time)
+															m_max_wait_time(max_wait_time),\
+															p_thread(std::make_shared<std::thread>(&Worker_Thread::run, this)),\
+															p_helper(std::make_shared<Helper>())
 {
-	p_thread = new std::thread(&Worker_Thread::run, this);
-	m_thread_id = p_thread->get_id();
-	p_thread->detach();
-	
-	p_helper = new Helper();
+	m_thread_id = p_thread.get()->get_id();
+	p_thread.get()->detach();
 }
 
 
 Worker_Thread::~Worker_Thread()
 {
 	this->stop();
-	if (p_thread != nullptr)
-	{
-		delete p_thread;
-		p_thread = nullptr;
-	}
-	if (p_helper != nullptr)
-	{
-		delete p_helper;
-		p_helper = nullptr;
-	}
 }
 
 
@@ -43,16 +32,6 @@ void Worker_Thread::run()
 		{
 			exception_Handle(e);
 			stop();
-			if (p_thread != nullptr)
-			{
-				delete p_thread;
-				p_thread = nullptr;
-			}
-			if (p_helper != nullptr)
-			{
-				delete p_helper;
-				p_helper = nullptr;
-			}
 		}
 	}
 }
@@ -85,7 +64,7 @@ bool Worker_Thread::do_Work()
 		//std::cout<< "wait_time: "<< _tp.time_since_epoch().count() - _insert_time.time_since_epoch().count() << std::endl;
 		//std::cout << std::this_thread::get_id() <<" task_queue size: " << _task_queue.size() << std::endl;
 
-		_work(p_helper);
+		_work(p_helper.get());
 	}
 	else
 	{

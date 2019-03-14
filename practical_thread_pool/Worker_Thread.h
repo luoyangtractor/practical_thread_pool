@@ -28,6 +28,7 @@ public:
 	std::thread::id m_worker_id;
 };
 
+
 class Helper
 {
 public:
@@ -56,9 +57,9 @@ private:
 	std::queue<std::pair<std::packaged_task<Result(Helper*)>, time_point>> m_task_queue;
 	std::mutex m_queue_mutex;
 	
-	std::thread* p_thread;
+	std::shared_ptr<std::thread> p_thread;
 
-	Helper* p_helper;
+	std::shared_ptr<Helper> p_helper;
 
 	int m_max_queue_size;
 	int m_max_wait_time;
