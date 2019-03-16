@@ -12,7 +12,7 @@ public:
 	explicit Worker_Thread_Manager(int thread_num = 12, int m_max_wait_time = 200, int max_queue_size = -1);
 	virtual ~Worker_Thread_Manager();
 
-	std::future<Result> dispatch_Work(std::function<Result(Helper*)> work);
+	std::future<Result> dispatch_Task(std::shared_ptr<Task>);
 private:
 	std::shared_ptr<Worker_Thread> choose_Suitable_Thread();
 
